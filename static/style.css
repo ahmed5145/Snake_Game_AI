@@ -1,3 +1,5 @@
+/* static/style.css */
+
 body {
     font-family: Arial, sans-serif;
     display: flex;
@@ -5,28 +7,18 @@ body {
     align-items: center;
     height: 100vh;
     background-color: #f0f0f0;
+    margin: 0;
 }
 
 .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.game-container {
-    margin-bottom: 20px;
-}
-
-.plot-container {
-    margin-bottom: 20px;
-}
-
-.controls {
     text-align: center;
 }
 
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
+#plotContainer {
+    margin-top: 20px;
+}
+
+#gameCanvas {
+    border: 1px solid #000;
+    margin-top: 20px;
 }

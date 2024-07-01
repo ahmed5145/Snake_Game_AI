@@ -17,8 +17,13 @@ class Agent:
         self.gamma = 0.9 # discount rate
         self.memory = deque(maxlen=MAX_MEMORY) #popleft()
         self.model = Linear_QNet(11, 256, 3)
-        self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)   
-        self.game = SnakeGameAI()  # Initialize your game instance
+        self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
+        self.scores = []
+        self.mean_scores = []
+        self.total_score = 0
+        self.record = 0
+        self.plot_data = None
+        
     
     def get_state(self,game):
         head = game.snake[0]
@@ -96,50 +101,46 @@ class Agent:
             final_move[move] = 1
             
         return final_move
+    
     def save_model(self):
         self.model.save()
     
-def train():
-    plot_scores = []
-    plot_mean_scores = []
-    total_score = 0
-    record = 0
-    agent = Agent()
-    game = SnakeGameAI()
-    while True:
-        # get old state
-        state_old = agent.get_state(game)
-        
-        # get move
-        final_move = agent.get_action(state_old)
-        
-        # perform move and get new state
-        reward, done, score = game.play_step(final_move)
-        state_new = agent.get_state(game)
-        
-        # train short memory
-        agent.train_short_memory(state_old, final_move, reward, state_new, done)
-        
-        # remember 
-        agent.remember(state_old, final_move, reward, state_new, done)
-        
-        if done:
-            #train long memory, plot results
-            game.reset()
-            agent.n_games += 1
-            agent.train_long_memory()
-            if score > record:
-                record = score
-                agent.model.save()
-                
-            print('Game', agent.n_games, 'Score', score, 'Record:', record)
-            
-            plot_scores.append(score)
-            total_score += score
-            mean_score = total_score / agent.n_games
-            plot_mean_scores.append(mean_score)
-            plot(plot_scores, plot_mean_scores)
+    def start_training(self):
+        game = SnakeGameAI()
+        while True:
+            # get old state
+            state_old = self.get_state(game)
 
-if __name__ == '__main__':
-    agent = Agent()
-    train()
+            # get move
+            final_move = self.get_action(state_old)
+
+            # perform move and get new state
+            reward, done, score = game.play_step(final_move)
+            state_new = self.get_state(game)
+
+            # train short memory
+            self.train_short_memory(state_old, final_move, reward, state_new, done)
+
+            # remember
+            self.remember(state_old, final_move, reward, state_new, done)
+
+            if done:
+                # train long memory, plot result
+                game.reset()
+                self.n_games += 1
+                self.train_long_memory()
+
+                if score > self.record:
+                    self.record = score
+                    self.model.save()
+
+                self.scores.append(score)
+                self.total_score += score
+                mean_score = self.total_score / self.n_games
+                self.mean_scores.append(mean_score)
+                self.plot_data = plot(self.scores, self.mean_scores)
+                print('Game', self.n_games, 'Score', score, 'Record:', self.record)
+
+                plot(self.scores, self.mean_scores)
+    def get_plot(self):
+        return self.plot_data

@@ -37,7 +37,7 @@ class SnakeGameAI:
         self.reset()
 
     def reset(self):
-                # init game state
+        # init game state
         self.direction = Direction.RIGHT
         
         self.head = Point(self.w/2, self.h/2)

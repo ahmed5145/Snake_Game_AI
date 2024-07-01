@@ -1,23 +1,21 @@
+<!-- index.html -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game AI</title>
+    <title>Snake Game AI Demo</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
-        <div class="game-container">
-            <canvas id="gameCanvas" width="640" height="480"></canvas>
-        </div>
-        <div class="plot-container">
-            <canvas id="plotCanvas" width="600" height="400"></canvas>
-        </div>
-        <div class="controls">
-            <button onclick="startTraining()">Start Training</button>
-        </div>
+        <h1>Snake Game AI Demo</h1>
+        <button id="startBtn" onclick="startTraining()">Start Training</button>
+        <div id="plotContainer"></div>
     </div>
+
     <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

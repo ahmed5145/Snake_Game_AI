@@ -1,21 +1,25 @@
+# server.py
+
 from flask import Flask, render_template, jsonify
 from agent import Agent
-from game import SnakeGameAI
-import numpy as np
+import threading
 
 app = Flask(__name__)
 agent = Agent()
-game = SnakeGameAI()  # Initialize your game instance
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/game-state')
-def game_state():
-    state = agent.get_state(game)  # Pass the game instance here
-    state_as_list = state.tolist()  # Convert NumPy array to Python list
-    return jsonify(state_as_list)
+@app.route('/start-training', methods=['POST'])
+def start_training():
+    threading.Thread(target=agent.start_training).start()
+    return jsonify({'message': 'Training started'})
+
+@app.route('/plot')
+def plot_image():
+    plot_data = agent.get_plot()
+    return jsonify({'plot': plot_data})
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,50 +1,20 @@
-const gameCanvas = document.getElementById('gameCanvas');
-const plotCanvas = document.getElementById('plotCanvas');
-const ctxGame = gameCanvas.getContext('2d');
-const ctxPlot = plotCanvas.getContext('2d');
-
-let gameId = null;
-let plotId = null;
+// app.js
 
 function startTraining() {
-    fetch('/start-training')
-        .then(response => response.text())
-        .then(data => console.log(data))
+    fetch('/start-training', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => console.log(data.message))
         .catch(error => console.error('Error starting training:', error));
 }
 
-function updateGame(state) {
-    // Update game canvas based on state (e.g., draw snake, food, score)
-}
-
-function updatePlot(scores, meanScores) {
-    // Update plot canvas based on scores and mean scores
-}
-
-function fetchGameState() {
-    fetch('/game-state')
+function fetchPlot() {
+    fetch('/plot')
         .then(response => response.json())
-        .then(state => updateGame(state))
-        .catch(error => console.error('Error fetching game state:', error));
+        .then(data => {
+            const plotContainer = document.getElementById('plotContainer');
+            plotContainer.innerHTML = `<img src="data:image/png;base64, ${data.plot}" alt="Plot"/>`;
+        })
+        .catch(error => console.error('Error fetching plot:', error));
 }
 
-function fetchPlotData() {
-    // Implement fetching plot data (optional based on your implementation)
-}
-
-function gameLoop() {
-    gameId = requestAnimationFrame(gameLoop);
-    fetchGameState();
-    // Fetch plot data if needed
-}
-
-function plotLoop() {
-    plotId = requestAnimationFrame(plotLoop);
-    fetchPlotData();
-}
-
-// Start game loop
-gameLoop();
-
-// Start plot loop if needed
-// plotLoop();
+setInterval(fetchPlot, 5000); // Update plot every 5 seconds

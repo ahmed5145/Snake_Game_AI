@@ -1,19 +1,25 @@
-import matplotlib.pyplot as plt
-from IPython import display
+# helper.py
 
-plt.ion()
+import matplotlib.pyplot as plt
+import io
+import base64
 
 def plot(scores, mean_scores):
-    display.clear_output(wait=True)
-    display.display(plt.gcf())
+    plt.figure(figsize=(12, 6))
     plt.clf()
     plt.title('Training...')
     plt.xlabel('Number of Games')
     plt.ylabel('Score')
-    plt.plot(scores)
-    plt.plot(mean_scores)
+    plt.plot(scores, label='Score')
+    plt.plot(mean_scores, label='Mean Score')
+    plt.legend()
     plt.ylim(ymin=0)
-    plt.text(len(scores)-1, scores[-1], str(scores[-1]))
-    plt.text(len(mean_scores)-1, mean_scores[-1], str(mean_scores[-1]))
-    plt.show(block=False)
-    plt.pause(.1)
+
+    # Convert plot to base64-encoded image
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    plot_data = base64.b64encode(buf.getvalue()).decode('utf-8')
+    plt.close()  # Close the figure to free up memory
+
+    return plot_data
