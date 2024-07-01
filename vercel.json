@@ -1,10 +1,19 @@
 {
-    "version": 2,
-    "builds": [
-      { "src": "server.py", "use": "@vercel/python" }
-    ],
-    "routes": [
-      { "src": "/(.*)", "dest": "server.py" }
-    ]
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    { "handle": "filesystem" },
+    {
+      "src": "/(.*)",
+      "dest": "server.py"
+    }
+  ],
+  "env": {
+    "PYTHON_VERSION": "3.12"
   }
-  
+}

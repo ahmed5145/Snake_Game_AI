@@ -3,8 +3,10 @@
 from flask import Flask, render_template, jsonify
 from agent import Agent
 import threading
+from flask_compress import Compress
 
 app = Flask(__name__)
+compress = Compress(app)
 agent = Agent()
 
 @app.route('/')
