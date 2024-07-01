@@ -18,6 +18,7 @@ class Agent:
         self.memory = deque(maxlen=MAX_MEMORY) #popleft()
         self.model = Linear_QNet(11, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)   
+        self.game = SnakeGameAI()  # Initialize your game instance
     
     def get_state(self,game):
         head = game.snake[0]
@@ -95,6 +96,8 @@ class Agent:
             final_move[move] = 1
             
         return final_move
+    def save_model(self):
+        self.model.save()
     
 def train():
     plot_scores = []
@@ -138,4 +141,5 @@ def train():
             plot(plot_scores, plot_mean_scores)
 
 if __name__ == '__main__':
+    agent = Agent()
     train()
