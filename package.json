@@ -1,0 +1,18 @@
+{
+    "name": "snake-game-ai-demo",
+    "version": "1.0.0",
+    "description": "Snake Game AI Demo",
+    "main": "server.py",
+    "scripts": {
+      "start": "python server.py",
+      "build": "echo 'No build process defined'",  
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Ahmed",
+    "license": "UNLICENSED",
+    "dependencies": {
+      "flask": "^2.0.2",
+      "flask-compress": "^1.10.1"
+    }
+  }
+  
