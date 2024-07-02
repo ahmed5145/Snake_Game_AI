@@ -5,7 +5,6 @@ from collections import deque
 from game import SnakeGameAI, Direction, Point
 from model import Linear_QNet, QTrainer
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
 from IPython import display
 
 MAX_MEMORY = 100_000
@@ -21,6 +20,9 @@ class Agent:
         self.memory = deque(maxlen=MAX_MEMORY)
         self.model = Linear_QNet(11, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
+        self.training_in_progress = False
+        self.plot_scores = []
+        self.plot_mean_scores = []
 
     def get_state(self, game):
         head = game.head
@@ -66,9 +68,25 @@ class Agent:
     def remember(self, state, action, reward, next_state, done):
         self.memory.append((state, action, reward, next_state, done))
 
+    def train_continuously(self):
+        self.training_in_progress = True
+        game = SnakeGameAI()
+        while self.training_in_progress:
+            state_old = self.get_state(game)
+            final_move = self.get_action(state_old)
+            reward, done, score = game.play_step(final_move)
+            state_new = self.get_state(game)
+            self.train_short_memory(state_old, final_move, reward, state_new, done)
+            self.remember(state_old, final_move, reward, state_new, done)
+            if done:
+                game.reset()
+                self.n_games += 1
+                self.train_long_memory()
+                self.update_plot_data(score)
+                print(f'Game: {self.n_games}, Score: {score}')
+        print('Training stopped.')
+        
     def train(self):
-        plot_scores = []
-        plot_mean_scores = []
         total_score = 0
         record = 0
         game = SnakeGameAI()
@@ -96,38 +114,44 @@ class Agent:
 
                 print('Game:', self.n_games, 'Score:', score, 'Record:', record)
 
-                plot_scores.append(score)
+                self.update_plot_data(score)  # Ensure score is passed to update_plot_data()
+
+                self.plot_scores.append(score)
                 total_score += score
                 mean_score = total_score / self.n_games
-                plot_mean_scores.append(mean_score)
+                self.plot_mean_scores.append(mean_score)
 
                 # Update plot in real-time
-                self.plot_progress(plot_scores, plot_mean_scores)
+                self.plot_progress()
 
                 # Exit training if necessary (for testing purposes)
-                #if self.n_games >= 100:  # Adjust as needed
-                    #break
+                # if self.n_games >= 100:  # Adjust as needed
+                #    break
 
-    def plot_progress(self, plot_scores, plot_mean_scores):
+    def update_plot_data(self, score):
+        self.plot_scores.append(score)
+        total_score = sum(self.plot_scores)
+        mean_score = total_score / len(self.plot_scores)
+        self.plot_mean_scores.append(mean_score)
+
+        
+    def plot_progress(self):
         plt.clf()
         plt.title('Snake Game AI Training Progress', fontsize=16, fontweight='bold')
         plt.xlabel('Number of Games', fontsize=14)
         plt.ylabel('Score', fontsize=14)
         plt.grid(True, which='both', linestyle='--', linewidth=0.5)
 
-        plt.plot(plot_scores, label='Score', color='blue', linestyle='-', marker='o', markersize=4)
-        plt.plot(plot_mean_scores, label='Mean Score', color='green', linestyle='-', marker='x', markersize=4)
+        plt.plot(self.plot_scores, label='Score', color='blue', linestyle='-', marker='o', markersize=4)
+        plt.plot(self.plot_mean_scores, label='Mean Score', color='green', linestyle='-', marker='x', markersize=4)
 
         plt.legend(loc='upper left', fontsize=12)
         plt.ylim(ymin=0)
 
-        plt.text(len(plot_scores)-1, plot_scores[-1], str(plot_scores[-1]))
-        plt.text(len(plot_mean_scores)-1, plot_mean_scores[-1], str(plot_mean_scores[-1]))
+        plt.text(len(self.plot_scores)-1, self.plot_scores[-1], str(self.plot_scores[-1]))
+        plt.text(len(self.plot_mean_scores)-1, self.plot_mean_scores[-1], str(self.plot_mean_scores[-1]))
 
-        display.clear_output(wait=True)
-        display.display(plt.gcf())
-
-        plt.pause(0.1)
+        plt.pause(0.1)  # Pause to allow plot to update
 
     def train_long_memory(self):
         if len(self.memory) > BATCH_SIZE:
