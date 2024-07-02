@@ -5,3 +5,4 @@ node_modules
 react_app
 __pycache__
 .vercel
+plot_data.txt
