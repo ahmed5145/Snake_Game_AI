@@ -1,9 +1,10 @@
-// app.js
-
 function startTraining() {
     fetch('/start-training', { method: 'POST' })
         .then(response => response.json())
-        .then(data => console.log(data.message))
+        .then(data => {
+            console.log(data.message); // Log success message if needed
+            // Optionally update UI to indicate training started
+        })
         .catch(error => console.error('Error starting training:', error));
 }
 
@@ -17,4 +18,8 @@ function fetchPlot() {
         .catch(error => console.error('Error fetching plot:', error));
 }
 
-setInterval(fetchPlot, 5000); // Update plot every 5 seconds
+// Initial fetch for plot when page loads
+fetchPlot();
+
+// Interval to fetch plot updates every 5 seconds
+setInterval(fetchPlot, 5000);
